@@ -1,18 +1,15 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 
-export type AuthorDocument = Author & Document;
+export type GenreDocument = Genre & Document;
 
 @Schema({ versionKey: false })
-export class Author {
+export class Genre {
   @Prop({ required: true })
-  name: string;
+  title: string;
 
   @Prop()
   description: string;
-
-  @Prop()
-  image: string;
 }
 
-export const AuthorSchema = SchemaFactory.createForClass(Author);
+export const GenreSchema = SchemaFactory.createForClass(Genre);

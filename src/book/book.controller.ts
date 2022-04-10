@@ -1,8 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { Pagination } from "src/utils/pagination.decorator";
 import { BookService } from "./book.service";
 import { Types } from "mongoose";
 import { CreateBook } from "./dto/createBook.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { extname } from "path";
 
 @Controller("/book")
 export class BookController {
@@ -21,7 +24,25 @@ export class BookController {
   }
 
   @Post("/")
-  async createBook(@Body() createBook: CreateBook) {
+  @UseInterceptors(
+    FileInterceptor("image", {
+      storage: diskStorage({
+        destination: "./public/book",
+        filename: (req, file, cb) => {
+          cb(null, Date.now() + extname(file.originalname));
+        },
+      }),
+    })
+  )
+  async createBook(@UploadedFile() image: Express.Multer.File, @Body() createBook: CreateBook) {
+    createBook.author = new Types.ObjectId(createBook.author);
+    createBook.publisher = new Types.ObjectId(createBook.publisher);
+
+    for (const i in createBook.genres) {
+      createBook.genres[i] = new Types.ObjectId(createBook.genres[i]);
+    }
+
+    createBook.image = image.path;
     return await this.bookService.create(createBook);
   }
 

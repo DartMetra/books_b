@@ -10,6 +10,9 @@ export class Publisher {
 
   @Prop()
   description: string;
+
+  @Prop()
+  image: string;
 }
 
 export const PublisherSchema = SchemaFactory.createForClass(Publisher);

@@ -8,11 +8,14 @@ export class Book {
   @Prop({ required: true })
   title: string;
 
-  @Prop({ ref: "Category" })
+  @Prop({ ref: "categories" })
   categories: Types.ObjectId[];
 
-  @Prop({ required: true, ref: "Author" })
+  @Prop({ required: true, ref: "authors" })
   author: Types.ObjectId;
+
+  @Prop({ required: false, ref: "genres" })
+  genres: Types.ObjectId[];
 
   @Prop()
   description: string;
@@ -23,7 +26,7 @@ export class Book {
   @Prop()
   date: Date;
 
-  @Prop()
+  @Prop({ ref: "publishers" })
   publisher: Types.ObjectId;
 }
 

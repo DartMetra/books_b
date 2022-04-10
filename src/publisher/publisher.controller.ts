@@ -1,8 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { Pagination } from "src/utils/pagination.decorator";
 import { PublisherService } from "./publisher.service";
 import { Types } from "mongoose";
 import { CreatePublisher } from "./dto/createPublisher.dto";
+import { extname } from "path";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
 
 @Controller("/publisher")
 export class PublisherController {
@@ -21,7 +24,18 @@ export class PublisherController {
   }
 
   @Post("/")
-  async createPublisher(@Body() createPublisher: CreatePublisher) {
+  @UseInterceptors(
+    FileInterceptor("image", {
+      storage: diskStorage({
+        destination: "./public/publisher",
+        filename: (req, file, cb) => {
+          cb(null, Date.now() + extname(file.originalname));
+        },
+      }),
+    })
+  )
+  async createPublisher(@UploadedFile() image: Express.Multer.File, @Body() createPublisher: CreatePublisher) {
+    createPublisher.image = image.path;
     return await this.publisherService.create(createPublisher);
   }
 

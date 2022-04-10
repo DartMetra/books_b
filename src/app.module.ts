@@ -8,9 +8,14 @@ import { UserModule } from "./user/user.module";
 import { PublisherModule } from "./publisher/publisher.module";
 import { AuthorModule } from "./author/author.module";
 import { BookModule } from "./book/book.module";
+import { GenreModule } from "./genre/genre.module";
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, "..", "public"),
+      serveRoot: "/public",
+    }),
     ConfigModule.forRoot({
       envFilePath: ".local.env",
       isGlobal: true,
@@ -20,6 +25,7 @@ import { BookModule } from "./book/book.module";
     UserModule,
     PublisherModule,
     AuthorModule,
+    GenreModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "public"),
       serveRoot: "public",

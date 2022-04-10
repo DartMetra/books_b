@@ -1,8 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { Pagination } from "src/utils/pagination.decorator";
 import { CategoryService } from "./category.service";
 import { CreateCategory } from "./dto/createCategory.dto";
 import { Types } from "mongoose";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { extname } from "path";
 
 @Controller("/category")
 export class CategoryController {
@@ -21,7 +24,18 @@ export class CategoryController {
   }
 
   @Post("/")
-  async createCategory(@Body() createCategory: CreateCategory) {
+  @UseInterceptors(
+    FileInterceptor("image", {
+      storage: diskStorage({
+        destination: "./public/category",
+        filename: (req, file, cb) => {
+          cb(null, Date.now() + extname(file.originalname));
+        },
+      }),
+    })
+  )
+  async createCategory(@UploadedFile() image: Express.Multer.File, @Body() createCategory: CreateCategory) {
+    createCategory.image = image.path;
     return await this.categoryService.create(createCategory);
   }
 

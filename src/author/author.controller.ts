@@ -1,8 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { Pagination } from "src/utils/pagination.decorator";
 import { AuthorService } from "./author.service";
 import { CreateAuthor } from "./dto/createAuthor.dto";
 import { Types } from "mongoose";
+import { diskStorage } from "multer";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { extname } from "path";
 
 @Controller("/author")
 export class AuthorController {
@@ -21,7 +24,18 @@ export class AuthorController {
   }
 
   @Post("/")
-  async createAuthor(@Body() createAuthor: CreateAuthor) {
+  @UseInterceptors(
+    FileInterceptor("image", {
+      storage: diskStorage({
+        destination: "./public/author",
+        filename: (req, file, cb) => {
+          cb(null, Date.now() + extname(file.originalname));
+        },
+      }),
+    })
+  )
+  async createAuthor(@UploadedFile() image: Express.Multer.File, @Body() createAuthor: CreateAuthor) {
+    createAuthor.image = image.path;
     return await this.authorService.create(createAuthor);
   }
 

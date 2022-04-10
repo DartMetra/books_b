@@ -3,7 +3,9 @@ import { Types } from "mongoose";
 export class CreateBook {
   title: string;
 
-  categories: Types.ObjectId[];
+  categories?: Types.ObjectId[];
+
+  genres?: Types.ObjectId[];
 
   author: Types.ObjectId;
 
@@ -11,7 +13,7 @@ export class CreateBook {
 
   image?: string;
 
-  date: Date;
+  date: string;
 
   publisher: Types.ObjectId;
 }
