@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { User } from "src/schemas/user.schema";
 import { Model } from "mongoose";
@@ -12,7 +12,7 @@ export class UserService {
   async login(email, password) {
     const user = await this.User.findOne({ email });
     if (!user) {
-      return;
+      throw new BadRequestException("login error");
     }
 
     if (compareSync(password, user.passwordHash)) {
@@ -54,11 +54,15 @@ export class UserService {
   }
 
   async genAccessToken({ email, _id, isAdmin }) {
-    return sign({ email, _id, isAdmin }, "123", { expiresIn: "20m" });
+    return sign({ email, _id, isAdmin }, "123", { expiresIn: "10s" });
   }
 
   async verifyAccessToken(token: string) {
-    return verify(token, "123");
+    try {
+      return verify(token, "123");
+    } catch (e) {
+      throw new UnauthorizedException("access token error");
+    }
   }
 
   async genRefreshToken({ _id }) {
@@ -66,6 +70,10 @@ export class UserService {
   }
 
   async verifyRefreshToken(token: string) {
-    return verify(token, "321");
+    try {
+      return verify(token, "321");
+    } catch (e) {
+      throw new UnauthorizedException("access token error");
+    }
   }
 }

@@ -1,5 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
+import { AdminGuard } from "../utils/admin.guard";
+import { TokenGuard } from "../utils/token.guard";
 
 @Controller("/user")
 export class UserController {
@@ -20,6 +22,7 @@ export class UserController {
     return await this.userService.refresh(refreshToken);
   }
 
+  @UseGuards(TokenGuard)
   @Get("/")
   async getUsers() {}
 
