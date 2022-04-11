@@ -22,12 +22,10 @@ export class AuthorService {
     if (query) {
       PIPELINE.push({
         $search: {
-          "index": "author_search",
+          "index": "author",
           "text": {
             "query": query,
-            "path": {
-              "wildcard": "*",
-            },
+            "path": "name",
             "fuzzy": {},
           },
         },

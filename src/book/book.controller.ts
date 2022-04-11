@@ -20,7 +20,7 @@ export class BookController {
 
   @Get("/:id")
   async getBookById(@Param("id") _id: Types.ObjectId) {
-    return await this.bookService.findById(_id);
+    return await this.bookService.findById(new Types.ObjectId(_id));
   }
 
   @Post("/")

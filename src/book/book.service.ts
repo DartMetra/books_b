@@ -17,7 +17,6 @@ export class BookService {
     const SORT = {
       $sort: {},
     };
-    SORT["$sort"][pag.sortBy] = pag.order;
 
     if (query) {
       PIPELINE.push({
@@ -25,14 +24,56 @@ export class BookService {
           "index": "books_search",
           "text": {
             "query": query,
-            "path": {
-              "wildcard": "*",
-            },
+            "path": "title",
             "fuzzy": {},
           },
         },
       });
+      PIPELINE.push({ $addFields: { score: { $meta: "searchScore" } } });
+
+      SORT["$sort"]["score"] = -1;
+    } else {
+      SORT["$sort"][pag.sortBy] = pag.order;
     }
+
+    PIPELINE.push({
+      "$lookup": {
+        from: "authors",
+        localField: "author",
+        foreignField: "_id",
+        as: "author",
+      },
+    });
+
+    PIPELINE.push({
+      "$set": {
+        author: { $first: "$author" },
+      },
+    });
+
+    PIPELINE.push({
+      "$lookup": {
+        from: "genres",
+        localField: "genres",
+        foreignField: "_id",
+        as: "genres",
+      },
+    });
+
+    PIPELINE.push({
+      "$lookup": {
+        from: "publishers",
+        localField: "publisher",
+        foreignField: "_id",
+        as: "publisher",
+      },
+    });
+
+    PIPELINE.push({
+      "$set": {
+        publisher: { $first: "$publisher" },
+      },
+    });
 
     PIPELINE.push({
       "$facet": {
@@ -54,7 +95,45 @@ export class BookService {
   }
 
   async findById(_id: Types.ObjectId) {
-    return await this.Book.findById(_id);
+    return (
+      await this.Book.aggregate([
+        {
+          $match: {
+            "_id": _id,
+          },
+        },
+        {
+          "$lookup": {
+            from: "authors",
+            localField: "author",
+            foreignField: "_id",
+            as: "author",
+          },
+        },
+        {
+          "$lookup": {
+            from: "publishers",
+            localField: "publisher",
+            foreignField: "_id",
+            as: "publisher",
+          },
+        },
+        {
+          "$lookup": {
+            from: "genres",
+            localField: "genres",
+            foreignField: "_id",
+            as: "genres",
+          },
+        },
+        {
+          "$set": {
+            author: { $first: "$author" },
+            publisher: { $first: "$publisher" },
+          },
+        },
+      ])
+    )[0];
   }
 
   async update(_id: Types.ObjectId, data: Partial<CreateBook>) {

@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { UserService } from "./user.service";
 
 @Controller("/user")
@@ -6,13 +6,19 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post("/auth/login")
-  async login() {}
+  async login(@Body() { email, password }) {
+    return await this.userService.login(email, password);
+  }
 
-  @Post("/auth/register")
-  async register() {}
+  @Post("/auth/registration")
+  async register(@Body() { email, password }) {
+    return await this.userService.register(email, password);
+  }
 
   @Post("/auth/refresh")
-  async refresh() {}
+  async refresh(@Body() { refreshToken }) {
+    return await this.userService.refresh(refreshToken);
+  }
 
   @Get("/")
   async getUsers() {}
