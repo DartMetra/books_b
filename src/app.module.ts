@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
-import { CategoryModule } from "./category/category.module";
 import { UserModule } from "./user/user.module";
 import { PublisherModule } from "./publisher/publisher.module";
 import { AuthorModule } from "./author/author.module";
@@ -21,7 +20,6 @@ import { GenreModule } from "./genre/genre.module";
       isGlobal: true,
     }),
     BookModule,
-    CategoryModule,
     UserModule,
     PublisherModule,
     AuthorModule,

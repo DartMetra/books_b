@@ -21,7 +21,7 @@ export class BookService {
     if (query) {
       PIPELINE.push({
         $search: {
-          "index": "books_search",
+          "index": "books",
           "text": {
             "query": query,
             "path": "title",
